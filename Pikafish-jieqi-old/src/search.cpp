@@ -971,6 +971,7 @@ namespace {
                     int tryTypeTimes = 0, typecount = 0;
                     bool isDarkDepth;
                     ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
+                    SC.setUs(pos.isFirstSide());
                     while (pos.getDark(darkSt, typecount, isDarkDepth))
                     {
                         Value vTmp;

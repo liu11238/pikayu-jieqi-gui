@@ -359,7 +359,12 @@ public:
     void setUs(bool us) { _us = !us; }
 
     void append(Piece, int score, int count) {
-        if (!_us) score *= -1;
+        // vTmp is evaluated from the side that made the move's perspective.
+        // Expected mode keeps the historical normalization to the first side,
+        // then converts the result back in CalcEvg().  Worst mode must minimize
+        // directly in the moving side's perspective: normalizing first would
+        // turn the second side's minimum into a maximum after the sign flip.
+        if (!_worst && !_us) score *= -1;
         if (_min > score)_min = score;
         if (_max < score)_max = score;
         score = std::clamp(score, -DARKVALRATE, DARKVALRATE);
@@ -371,12 +376,13 @@ public:
         if (!_totalCount)
             return VALUE_ZERO;
 
-        // Scores are normalized to the root side before aggregation.  Expected
-        // mode uses the remaining pool counts as probabilities; Worst mode
-        // chooses the least favorable possible identity.
+        // Expected mode uses the remaining pool counts as probabilities and
+        // restores the moving-side perspective after aggregation.  Worst mode
+        // already aggregates directly in that perspective, so its minimum is
+        // returned without another sign conversion.
         int v = _worst ? _min : (_totalScore / _totalCount);
         v = std::clamp(v, -DARKVALRATE, DARKVALRATE);
-        if (!_us) v *= -1;
+        if (!_worst && !_us) v *= -1;
         assert(v > -VALUE_INFINITE && v < VALUE_INFINITE);
         return Value(v);
     }
