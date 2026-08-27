@@ -1,0 +1,84 @@
+皮卡鱼 2026-08-27 开发团队: 皮卡鱼开发团队(详情请查看作者文件)
+皮卡鱼(http://pikafish.org)是开源免费的象棋引擎, 欢迎加入我们的QQ群: 755655813
+
+Position: 1/11 (xxxxkxxxx/9/1x5x1/x1x1x1x1x/9/9/X1X1X1X1X/1X5X1/9/XXXXKXXXX b R2C2P5N2B2r2a2c2p5n2b2 0 1)
+info depth 1 seldepth 1 multipv 1 score cp -549 nodes 3812 nps 1270666 hashfull 6 tbhits 0 time 3 pv b9c7
+info depth 2 seldepth 2 multipv 1 score cp -396 nodes 25230 nps 1802142 hashfull 47 tbhits 0 time 14 pv h9g7
+info depth 3 seldepth 2 multipv 1 score cp -396 nodes 96659 nps 2101282 hashfull 155 tbhits 0 time 46 pv h9g7
+info depth 4 seldepth 3 multipv 1 score cp -402 nodes 98160 nps 2133913 hashfull 156 tbhits 0 time 46 pv h9g7 b2b9
+bestmove h9g7 ponder b2b9
+
+Position: 2/11 (C2k1xx1x/9/p1n3p2/x1x1x1x2/8r/4P4/2X3X1X/7X1/1c7/XXXXKXXXX b R2C1P3N2B2a2c1p2n1b1 0 1)
+info depth 1 seldepth 1 multipv 1 score cp -1279 nodes 523 nps 523000 hashfull 1 tbhits 0 time 1 pv i5f5
+info depth 2 seldepth 2 multipv 1 score cp -1121 nodes 660 nps 660000 hashfull 1 tbhits 0 time 1 pv i5d5
+info depth 3 seldepth 2 multipv 1 score cp -1103 nodes 4422 nps 1474000 hashfull 8 tbhits 0 time 3 pv i5c5
+info depth 4 seldepth 2 multipv 1 score cp -986 nodes 4733 nps 1577666 hashfull 8 tbhits 0 time 3 pv i5d5
+bestmove i5d5
+
+Position: 3/11 (xxxx1Rxxx/4k2C1/3ap4/xAx1p4/6p1P/9/2X1X1X2/9/5K3/XXX2XXXX b C1P4N2B2r2a1c1p2n2b1 0 1)
+info depth 1 seldepth 1 multipv 1 score cp -1421 nodes 2120 nps 1060000 hashfull 6 tbhits 0 time 2 pv e8d8 a0a6
+info depth 2 seldepth 2 multipv 1 score cp -1555 nodes 4010 nps 1336666 hashfull 8 tbhits 0 time 3 pv i9i7 a0a6
+info depth 3 seldepth 3 multipv 1 score cp -1720 nodes 7596 nps 1266000 hashfull 14 tbhits 0 time 6 pv i9i7 f9g9
+info depth 4 seldepth 4 multipv 1 score cp -1743 nodes 8885 nps 1480833 hashfull 16 tbhits 0 time 6 pv i9i7 f9g9
+bestmove i9i7 ponder f9g9
+
+Position: 4/11 (1xxxkxxxx/1R7/8r/2x3xBx/4p4/2P6/c3X1c1X/N5N2/9/rXXXKXX1X b R1C2P3a2p4n2b2 0 1)
+info depth 1 seldepth 1 multipv 1 score cp 253 nodes 154 nps 77000 hashfull 0 tbhits 0 time 2 pv g3g0 i0g0
+info depth 2 seldepth 2 multipv 1 score cp 253 nodes 561 nps 280500 hashfull 1 tbhits 0 time 2 pv g3g0 i0g0
+info depth 3 seldepth 3 multipv 1 score cp 253 nodes 1414 nps 471333 hashfull 3 tbhits 0 time 3 pv g3g0 i0g0
+info depth 4 seldepth 3 multipv 1 score cp 253 nodes 2087 nps 695666 hashfull 3 tbhits 0 time 3 pv g3g0 i0g0
+bestmove g3g0 ponder i0g0
+
+Position: 5/11 (xxxx1kx1x/1p7/7n1/x1x6/9/P1C1p1n2/1A6X/1X7/4P2c1/X1XXK1XXX b R2C1P2N1r2a2c1p3 0 1)
+info depth 1 seldepth 1 multipv 1 score cp -191 nodes 1031 nps 515500 hashfull 1 tbhits 0 time 2 pv g4f2 e0f0
+info depth 2 seldepth 2 multipv 1 score cp -191 nodes 1465 nps 732500 hashfull 2 tbhits 0 time 2 pv g4f2 e0f0
+info depth 3 seldepth 3 multipv 1 score cp -191 nodes 1968 nps 984000 hashfull 2 tbhits 0 time 2 pv g4f2 e0f0
+info depth 4 seldepth 3 multipv 1 score cp -191 nodes 2269 nps 1134500 hashfull 2 tbhits 0 time 2 pv g4f2 e0f0
+bestmove g4f2 ponder e0f0
+
+Position: 6/11 (x2xk2x1/4prN2/2c1p3a/x1x1x1x1B/1P2n4/8P/X1X6/2C6/9/XXXXKXXC1 b R2P2N1B1r1a1c1p1n1b2 0 1)
+info depth 1 seldepth 1 multipv 1 score cp -1062 nodes 95 nps 47500 hashfull 0 tbhits 0 time 2 pv e5f3
+info depth 2 seldepth 2 multipv 1 score cp -882 nodes 257 nps 128500 hashfull 0 tbhits 0 time 2 pv e5d3
+info depth 3 seldepth 2 multipv 1 score cp -637 nodes 495 nps 247500 hashfull 0 tbhits 0 time 2 pv c7c3
+info depth 4 seldepth 2 multipv 1 score cp 1547 nodes 574 nps 287000 hashfull 0 tbhits 0 time 2 pv c7c3
+bestmove c7c3
+
+Position: 7/11 (2x1kx3/4pb3/3bc3p/4C4/4p1p1p/4Pr2A/Xa2c1X1X/6P2/9/1B1XKXX2 b R1P3N1n2 0 1)
+info depth 1 seldepth 1 multipv 1 score cp 2277 nodes 70 nps 70000 hashfull 0 tbhits 0 time 1 pv f4f2
+info depth 2 seldepth 2 multipv 1 score cp 2631 nodes 115 nps 115000 hashfull 0 tbhits 0 time 1 pv f4h4
+info depth 3 seldepth 2 multipv 1 score cp 2631 nodes 149 nps 149000 hashfull 0 tbhits 0 time 1 pv f4h4
+info depth 4 seldepth 2 multipv 1 score cp 2875 nodes 215 nps 215000 hashfull 0 tbhits 0 time 1 pv f4h4 e4e5 e3e6 f0e1
+bestmove f4h4 ponder e4e5
+
+Position: 8/11 (3k5/5r3/C8/9/9/1B7/9/7A1/7N1/4K4 w  0 1)
+info depth 1 seldepth 1 multipv 1 score cp 368 nodes 26 nps 26000 hashfull 0 tbhits 0 time 1 pv a7a5
+info depth 2 seldepth 2 multipv 1 score cp 374 nodes 70 nps 70000 hashfull 1 tbhits 0 time 1 pv a7a6
+info depth 3 seldepth 2 multipv 1 score cp 374 nodes 158 nps 158000 hashfull 1 tbhits 0 time 1 pv a7a6
+info depth 4 seldepth 2 multipv 1 score cp 374 nodes 202 nps 202000 hashfull 1 tbhits 0 time 1 pv a7a6 f8e8 e0f0
+bestmove a7a6 ponder f8e8
+
+Position: 9/11 (5x3/4k3p/4c1rc1/4R4/P3P4/9/6B2/9/6r2/X1X1K1B1X b P2a1p1n1 0 1)
+info depth 1 seldepth 1 multipv 1 score cp 1475 nodes 42 nps 42000 hashfull 0 tbhits 0 time 1 pv g1g3
+info depth 2 seldepth 2 multipv 1 score cp 1660 nodes 78 nps 78000 hashfull 0 tbhits 0 time 1 pv g1g3
+info depth 3 seldepth 2 multipv 1 score cp 1660 nodes 112 nps 112000 hashfull 0 tbhits 0 time 1 pv g1g3
+info depth 4 seldepth 2 multipv 1 score cp 1909 nodes 151 nps 151000 hashfull 0 tbhits 0 time 1 pv g1g3
+bestmove g1g3
+
+Position: 10/11 (x3kxxr1/3n5/3Cb4/xR5a1/2p6/P2N2P1P/2c3B2/9/A4Ab2/4K2XX b P1r1p3 0 1)
+info depth 1 seldepth 1 multipv 1 score cp 182 nodes 51 nps 25500 hashfull 0 tbhits 0 time 2 pv g1e3
+info depth 2 seldepth 2 multipv 1 score cp 1430 nodes 104 nps 52000 hashfull 0 tbhits 0 time 2 pv c3e3
+info depth 3 seldepth 2 multipv 1 score cp 1430 nodes 153 nps 76500 hashfull 0 tbhits 0 time 2 pv c3e3
+info depth 4 seldepth 2 multipv 1 score cp 1430 nodes 205 nps 102500 hashfull 0 tbhits 0 time 2 pv c3e3
+bestmove c3e3
+
+Position: 11/11 (4k1x2/1n2p2a1/4b2P1/9/2p3b2/P3B1r2/6B2/c3N4/A3CA3/4K3X b p1 0 1)
+info depth 1 seldepth 1 multipv 1 score cp 675 nodes 39 nps 39000 hashfull 0 tbhits 0 time 1 pv a2a3 h7h8
+info depth 2 seldepth 2 multipv 1 score cp 786 nodes 84 nps 84000 hashfull 0 tbhits 0 time 1 pv h8i7
+info depth 3 seldepth 2 multipv 1 score cp 791 nodes 192 nps 192000 hashfull 0 tbhits 0 time 1 pv h8i9
+info depth 4 seldepth 2 multipv 1 score cp 786 nodes 245 nps 245000 hashfull 0 tbhits 0 time 1 pv h8i7
+bestmove h8i7
+
+===========================
+Total time (ms) : 61
+Nodes searched  : 117731
+Nodes/second    : 1930016

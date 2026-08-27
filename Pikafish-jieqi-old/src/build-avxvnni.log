@@ -1,0 +1,630 @@
+
+Config:
+debug: 'no'
+sanitize: 'none'
+optimize: 'yes'
+arch: 'x86_64'
+bits: '64'
+kernel: 'MINGW64_NT-10.0-26200'
+os: ''
+prefetch: 'yes'
+popcnt: 'yes'
+pext: 'yes'
+sse: 'yes'
+mmx: 'no'
+sse2: 'yes'
+ssse3: 'yes'
+sse41: 'yes'
+avx2: 'yes'
+avxvnni: 'yes'
+avx512: 'no'
+vnni256: 'no'
+vnni512: 'no'
+neon: 'no'
+arm_version: '0'
+
+Flags:
+CXX: g++
+CXXFLAGS:  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one
+LDFLAGS:   -m64 -Wl,--no-as-needed -lpthread  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one -flto=jobserver
+
+Testing config sanity. If this fails, try 'make help' ...
+
+make ARCH=x86-64-avxvnni COMP=gcc all
+make[1]: 进入目录“/d/code/git/pikayu/Pikafish-jieqi-old/src”
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o benchmark.o benchmark.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o bitboard.o bitboard.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o evaluate.o evaluate.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o main.o main.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o material.o material.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o misc.o misc.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o movegen.o movegen.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o movepick.o movepick.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o position.o position.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o psqt.o psqt.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o search.o search.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o thread.o thread.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o timeman.o timeman.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o tt.o tt.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o uci.o uci.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o ucioption.o ucioption.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o tune.o tune.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o evaluate_nnue.o nnue/evaluate_nnue.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o half_ka_v2_hm.o nnue/features/half_ka_v2_hm.cpp
+g++  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one   -c -o zip.o compression/zip.cpp
+In file included from bitboard.cpp:23:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from nnue/nnue_common.h:27,
+                 from nnue/nnue_architecture.h:26,
+                 from nnue/nnue_accumulator.h:24,
+                 from position.h:34,
+                 from benchmark.cpp:24:
+nnue/../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+benchmark.cpp: In function 'std::vector<std::__cxx11::basic_string<char> > Stockfish::setup_bench(const Position&, std::istream&)':
+benchmark.cpp:108:10: warning: variable 'posCounter' set but not used [-Wunused-but-set-variable=]
+  108 |   size_t posCounter = 0;
+      |          ^~~~~~~~~~
+In file included from evaluate.cpp:29:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from material.h:19,
+                 from material.cpp:19:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from nnue/nnue_common.h:27,
+                 from nnue/nnue_architecture.h:26,
+                 from nnue/nnue_accumulator.h:24,
+                 from position.h:34,
+                 from main.cpp:19:
+nnue/../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from nnue/nnue_common.h:27,
+                 from nnue/nnue_architecture.h:26,
+                 from nnue/nnue_accumulator.h:24,
+                 from position.h:34,
+                 from movegen.cpp:22:
+nnue/../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+evaluate.cpp: In function 'std::string Stockfish::Eval::trace(Stockfish::Position&)':
+evaluate.cpp:602:17: warning: declaration of 'v' shadows a previous local [-Wshadow]
+  602 |           Value v = VALUE_NONE;
+      |                 ^
+evaluate.cpp:562:9: note: shadowed declaration is here
+  562 |   Value v;
+      |         ^
+evaluate.cpp:606:20: warning: unused variable 'st' [-Wunused-variable]
+  606 |               auto st = pos.state();
+      |                    ^~
+In file included from nnue/nnue_common.h:27,
+                 from nnue/nnue_architecture.h:26,
+                 from nnue/nnue_accumulator.h:24,
+                 from position.h:34,
+                 from movepick.h:27,
+                 from movepick.cpp:22:
+nnue/../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+evaluate.cpp: In instantiation of 'void Stockfish::{anonymous}::Evaluation<T>::initialize() [with Stockfish::Color Us = Stockfish::WHITE; Stockfish::Trace::Tracing T = Stockfish::Trace::NO_TRACE]':
+evaluate.cpp:461:22:   required from 'Stockfish::Value Stockfish::{anonymous}::Evaluation<T>::value() [with Stockfish::Trace::Tracing T = Stockfish::Trace::NO_TRACE]'
+  461 |     initialize<WHITE>();
+      |     ~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:513:46:   required from here
+  513 |     Value v = Evaluation<NO_TRACE>(pos).value();
+      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:221:25: warning: unused variable 'Them' [-Wunused-variable]
+  221 |     constexpr Color     Them = ~Us;
+      |                         ^~~~
+evaluate.cpp:248:14: warning: unused variable 'b0' [-Wunused-variable]
+  248 |     Bitboard b0 = pos.pieces(Us, PAWN) & LowRanks;
+      |              ^~
+evaluate.cpp: In instantiation of 'void Stockfish::{anonymous}::Evaluation<T>::initialize() [with Stockfish::Color Us = Stockfish::BLACK; Stockfish::Trace::Tracing T = Stockfish::Trace::NO_TRACE]':
+evaluate.cpp:462:22:   required from 'Stockfish::Value Stockfish::{anonymous}::Evaluation<T>::value() [with Stockfish::Trace::Tracing T = Stockfish::Trace::NO_TRACE]'
+  462 |     initialize<BLACK>();
+      |     ~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:513:46:   required from here
+  513 |     Value v = Evaluation<NO_TRACE>(pos).value();
+      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:221:25: warning: unused variable 'Them' [-Wunused-variable]
+  221 |     constexpr Color     Them = ~Us;
+      |                         ^~~~
+evaluate.cpp:248:14: warning: unused variable 'b0' [-Wunused-variable]
+  248 |     Bitboard b0 = pos.pieces(Us, PAWN) & LowRanks;
+      |              ^~
+In file included from position.cpp:27:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from search.h:24,
+                 from thread.cpp:23:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+evaluate.cpp: In instantiation of 'void Stockfish::{anonymous}::Evaluation<T>::initialize() [with Stockfish::Color Us = Stockfish::WHITE; Stockfish::Trace::Tracing T = Stockfish::Trace::TRACE]':
+evaluate.cpp:461:22:   required from 'Stockfish::Value Stockfish::{anonymous}::Evaluation<T>::value() [with Stockfish::Trace::Tracing T = Stockfish::Trace::TRACE]'
+  461 |     initialize<WHITE>();
+      |     ~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:625:35:   required from here
+  625 |   v = Evaluation<TRACE>(pos).value();
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:221:25: warning: unused variable 'Them' [-Wunused-variable]
+  221 |     constexpr Color     Them = ~Us;
+      |                         ^~~~
+evaluate.cpp:248:14: warning: unused variable 'b0' [-Wunused-variable]
+  248 |     Bitboard b0 = pos.pieces(Us, PAWN) & LowRanks;
+      |              ^~
+evaluate.cpp: In instantiation of 'void Stockfish::{anonymous}::Evaluation<T>::initialize() [with Stockfish::Color Us = Stockfish::BLACK; Stockfish::Trace::Tracing T = Stockfish::Trace::TRACE]':
+evaluate.cpp:462:22:   required from 'Stockfish::Value Stockfish::{anonymous}::Evaluation<T>::value() [with Stockfish::Trace::Tracing T = Stockfish::Trace::TRACE]'
+  462 |     initialize<BLACK>();
+      |     ~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:625:35:   required from here
+  625 |   v = Evaluation<TRACE>(pos).value();
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+evaluate.cpp:221:25: warning: unused variable 'Them' [-Wunused-variable]
+  221 |     constexpr Color     Them = ~Us;
+      |                         ^~~~
+evaluate.cpp:248:14: warning: unused variable 'b0' [-Wunused-variable]
+  248 |     Bitboard b0 = pos.pieces(Us, PAWN) & LowRanks;
+      |              ^~
+In file included from search.cpp:27:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from search.h:24,
+                 from timeman.cpp:23:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+In file included from ucioption.cpp:25:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+In file included from tt.cpp:24:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+position.cpp: In member function 'Stockfish::Position& Stockfish::Position::set(const std::string&, Stockfish::StateInfo*, Stockfish::Thread*)':
+position.cpp:148:14: warning: 'void* memset(void*, int, size_t)' clearing an object of type 'class Stockfish::Position' with no trivial copy-assignment; use value-initialization instead [-Wclass-memaccess]
+  148 |   std::memset(this, 0, sizeof(Position));
+      |   ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from position.cpp:28:
+position.h:96:7: note: 'class Stockfish::Position' declared here
+   96 | class Position {
+      |       ^~~~~~~~
+position.cpp:143:23: warning: variable 'lastToken' set but not used [-Wunused-but-set-variable=]
+  143 |   unsigned char token,lastToken;
+      |                       ^~~~~~~~~
+position.cpp: In member function 'std::string Stockfish::Position::fen() const':
+position.cpp:348:21: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  348 |   for (int i = 0; i < restPieces[WHITE].size(); i++) {
+      |                   ~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+position.cpp:355:21: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  355 |   for (int i = 0; i < restPieces[BLACK].size(); i++) {
+      |                   ~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+position.cpp: In member function 'bool Stockfish::Position::getDark(Stockfish::StateInfo&, int&, bool&)':
+position.cpp:553:11: warning: unused variable 'darkV' [-Wunused-variable]
+  553 |     Value darkV = Value(restPieces[us].evgValue());
+      |           ^~~~~
+In file included from D:/APPS/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/stddef.h:1,
+                 from D:/APPS/msys64/ucrt64/include/stdint.h:32,
+                 from D:/APPS/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/stdint.h:11,
+                 from D:/APPS/msys64/ucrt64/include/c++/16.1.0/cstdint:47,
+                 from types.h:41,
+                 from bitboard.h:24,
+                 from position.cpp:26:
+position.cpp: In member function 'bool Stockfish::Position::is_repeated(Stockfish::Value&, int) const':
+position.cpp:1229:68: warning: 'offsetof' within non-standard-layout type 'Stockfish::Position' is conditionally-supported [-Winvalid-offsetof]
+ 1229 |             memcpy((void *)&rollback, (const void *)this, offsetof(Position, filter));
+      |                                                                    ^
+search.cpp: In function 'Stockfish::Value Stockfish::{anonymous}::search(Stockfish::Position&, Stockfish::Search::Stack*, Stockfish::Value, Stockfish::Value, Stockfish::Depth, bool)':
+search.cpp:1003:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+ 1003 |     if (    PvNode
+      |     ^~
+search.cpp:1007:9: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+ 1007 |         if (    PvNode
+      |         ^~
+search.cpp:1196:19: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+ 1196 |                   if (history > 0 && quietCount < 64)
+      |                   ^~
+search.cpp:1197:77: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+ 1197 |                       quietsSearched[quietCount++] = move;                  continue;
+      |                                                                             ^~~~~~~~
+In file included from nnue/nnue_common.h:27,
+                 from nnue/nnue_architecture.h:26,
+                 from nnue/nnue_accumulator.h:24,
+                 from position.h:34,
+                 from uci.cpp:27:
+nnue/../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+search.cpp: In instantiation of 'Stockfish::Value Stockfish::{anonymous}::search(Stockfish::Position&, Stockfish::Search::Stack*, Stockfish::Value, Stockfish::Value, Stockfish::Depth, bool) [with NodeType nodeType = Stockfish::<unnamed>::Root; Stockfish::Depth = int]':
+search.cpp:443:50:   required from here
+  443 |               bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+search.cpp:1307:15: warning: unused variable 'a' [-Wunused-variable]
+ 1307 |           int a = 0;
+      |               ^
+search.cpp:1299:11: warning: variable 'tryTypeTimes' set but not used [-Wunused-but-set-variable=]
+ 1299 |       int tryTypeTimes = 0, typecount = 0;
+      |           ^~~~~~~~~~~~
+In file included from nnue/features/../nnue_common.h:27,
+                 from nnue/features/half_ka_v2_hm.h:24,
+                 from nnue/features/half_ka_v2_hm.cpp:21:
+nnue/features/../../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/features/../../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/features/../../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/features/../../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/features/../../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/features/../../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/features/../../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/features/../../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/features/../../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+search.cpp: In instantiation of 'Stockfish::Value Stockfish::{anonymous}::search(Stockfish::Position&, Stockfish::Search::Stack*, Stockfish::Value, Stockfish::Value, Stockfish::Depth, bool) [with NodeType nodeType = Stockfish::<unnamed>::NonPV; Stockfish::Depth = int]':
+search.cpp:869:41:   required from 'Stockfish::Value Stockfish::{anonymous}::search(Stockfish::Position&, Stockfish::Search::Stack*, Stockfish::Value, Stockfish::Value, Stockfish::Depth, bool) [with NodeType nodeType = Stockfish::<unnamed>::Root; Stockfish::Depth = int]'
+  869 |         Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
+      |                            ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+search.cpp:443:50:   required from here
+  443 |               bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+search.cpp:1307:15: warning: unused variable 'a' [-Wunused-variable]
+ 1307 |           int a = 0;
+      |               ^
+search.cpp:1299:11: warning: variable 'tryTypeTimes' set but not used [-Wunused-but-set-variable=]
+ 1299 |       int tryTypeTimes = 0, typecount = 0;
+      |           ^~~~~~~~~~~~
+search.cpp: In instantiation of 'Stockfish::Value Stockfish::{anonymous}::search(Stockfish::Position&, Stockfish::Search::Stack*, Stockfish::Value, Stockfish::Value, Stockfish::Depth, bool) [with NodeType nodeType = Stockfish::<unnamed>::PV; Stockfish::Depth = int]':
+search.cpp:1462:29:   required from 'Stockfish::Value Stockfish::{anonymous}::search(Stockfish::Position&, Stockfish::Search::Stack*, Stockfish::Value, Stockfish::Value, Stockfish::Depth, bool) [with NodeType nodeType = Stockfish::<unnamed>::Root; Stockfish::Depth = int]'
+ 1462 |           vTmp = -search<PV>(pos, ss+1, -beta, -alpha,
+      |                   ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1463 |               isDarkDepth ? 0 : std::min(maxNextDepth, newDepth), false);
+      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+search.cpp:443:50:   required from here
+  443 |               bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+search.cpp:1307:15: warning: unused variable 'a' [-Wunused-variable]
+ 1307 |           int a = 0;
+      |               ^
+search.cpp:1299:11: warning: variable 'tryTypeTimes' set but not used [-Wunused-but-set-variable=]
+ 1299 |       int tryTypeTimes = 0, typecount = 0;
+      |           ^~~~~~~~~~~~
+In file included from nnue/../nnue/nnue_common.h:27,
+                 from nnue/../nnue/nnue_architecture.h:26,
+                 from nnue/../nnue/nnue_accumulator.h:24,
+                 from nnue/../position.h:34,
+                 from nnue/evaluate_nnue.cpp:28:
+nnue/../nnue/../misc.h: In member function 'void Stockfish::RestList::print()':
+nnue/../nnue/../misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+nnue/../nnue/../misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+nnue/../nnue/../misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+nnue/../nnue/../misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+nnue/../nnue/../misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+nnue/../nnue/../misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+nnue/../nnue/../misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+nnue/../nnue/../misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+position.cpp: In function 'Stockfish::Position::init()':
+position.cpp:106:35: warning: iteration 5 invokes undefined behavior [-Waggressive-loop-optimizations]
+  106 |           Zobrist::psqDark[pc][i] = rng.rand<Key>();
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+position.cpp:105:25: note: within this loop
+  105 |       for (int i = 0; i <= 6; ++i)
+      |                       ~~^~~~
+compression/zip.cpp: In function 'ssize_t zip_stream_copy(zip_t*, void**, size_t*)':
+compression/zip.cpp:1667:17: warning: 'void* calloc(size_t, size_t)' sizes specified with 'sizeof' in the earlier argument and not in the later argument [-Wcalloc-transposed-args]
+ 1667 |   *buf = calloc(sizeof(unsigned char), n);
+      |                 ^~~~~~~~~~~~~~~~~~~~~
+compression/zip.cpp:1667:17: note: earlier argument should specify number of elements, later size of each element
+In file included from misc.cpp:61:
+misc.h: In member function 'void Stockfish::RestList::print()':
+misc.h:291:27: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  291 |         for (int i = 0; i < this->size_; i++)
+      |                         ~~^~~~~~~~~~~~~
+misc.h:309:31: warning: comparison of integer expressions of different signedness: 'int' and 'std::size_t' {aka 'long long unsigned int'} [-Wsign-compare]
+  309 |             for (int j = 0; j < typePos[t].size(); j++)
+      |                             ~~^~~~~~~~~~~~~~~~~~~
+misc.h: In constructor 'Stockfish::ScoreCalc::ScoreCalc(int, int, bool)':
+misc.h:394:9: warning: 'Stockfish::ScoreCalc::_depth' will be initialized after [-Wreorder]
+  394 |     int _depth;
+      |         ^~~~~~
+misc.h:392:10: warning:   'bool Stockfish::ScoreCalc::_us' [-Wreorder]
+  392 |     bool _us;
+      |          ^~~
+misc.h:353:5: warning:   when initialized here [-Wreorder]
+  353 |     ScoreCalc(int Ldepth, int depth, bool us) :
+      |     ^~~~~~~~~
+misc.h: In member function 'void Stockfish::ScoreCalc::append(Stockfish::Piece, int, int)':
+misc.h:358:23: warning: unused parameter 'p' [-Wunused-parameter]
+  358 |     void append(Piece p, int score, int count) {
+      |                 ~~~~~~^
+g++ -o PikaJieQi benchmark.o bitboard.o evaluate.o main.o material.o misc.o movegen.o movepick.o position.o psqt.o search.o thread.o timeman.o tt.o uci.o ucioption.o tune.o evaluate_nnue.o half_ka_v2_hm.o zip.o   -m64 -Wl,--no-as-needed -lpthread  -Wall -Wcast-qual -fno-exceptions -std=c++17  -pedantic -Wextra -Wshadow -m64 -DUSE_PTHREADS -DNDEBUG -O3 -DIS_64BIT -msse -msse3 -mpopcnt -DUSE_POPCNT -DUSE_AVX2 -mavx2 -mbmi -DUSE_VNNI -DUSE_AVXVNNI -mavxvnni -DUSE_SSE41 -msse4.1 -DUSE_SSSE3 -mssse3 -DUSE_SSE2 -msse2 -DUSE_PEXT -mbmi2 -flto -flto-partition=one -flto=jobserver
+In function 'init',
+    inlined from 'main' at main.cpp:35:17:
+position.cpp:106:35: warning: iteration 5 invokes undefined behavior [-Waggressive-loop-optimizations]
+  106 |           Zobrist::psqDark[pc][i] = rng.rand<Key>();
+      |                                   ^
+position.cpp:105:25: note: within this loop
+  105 |       for (int i = 0; i <= 6; ++i)
+      |                         ^
+make[1]: 离开目录“/d/code/git/pikayu/Pikafish-jieqi-old/src”

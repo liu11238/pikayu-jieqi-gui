@@ -1,0 +1,36 @@
+皮卡鱼 2026-08-27 开发团队: 皮卡鱼开发团队(详情请查看作者文件)
+皮卡鱼(http://pikafish.org)是开源免费的象棋引擎, 欢迎加入我们的QQ群: 755655813
+id name 皮卡鱼 2026-08-27
+id author 皮卡鱼开发团队(详情请查看作者文件)
+
+option name Debug Log File type string default 
+option name Threads type spin default 1 min 1 max 1024
+option name Hash type spin default 16 min 1 max 33554432
+option name Clear Hash type button
+option name Ponder type check default false
+option name MultiPV type spin default 1 min 1 max 500
+option name Move Overhead type spin default 10 min 0 max 5000
+option name Slow Mover type spin default 100 min 10 max 1000
+option name nodestime type spin default 0 min 0 max 10000
+option name UCI_AnalyseMode type check default false
+option name UCI_ShowWDL type check default false
+option name EvalFile type string default pikafish.nnue
+uciok
+readyok
+info depth 1 seldepth 1 multipv 1 score cp -549 nodes 3812 nps 1906000 hashfull 2 tbhits 0 time 2 pv b9c7
+info depth 2 seldepth 2 multipv 1 score cp -400 nodes 24535 nps 2230454 hashfull 13 tbhits 0 time 11 pv h9g7
+info depth 3 seldepth 2 multipv 1 score cp -400 nodes 94887 nps 2314317 hashfull 44 tbhits 0 time 41 pv h9g7
+info depth 4 seldepth 3 multipv 1 score cp -407 nodes 96324 nps 2293428 hashfull 44 tbhits 0 time 42 pv h9g7 b2b9
+info depth 5 seldepth 4 multipv 1 score cp -551 nodes 350218 nps 2382435 hashfull 147 tbhits 0 time 147 pv g6g5 i3i4 g5g3
+info depth 6 seldepth 4 multipv 1 score cp -527 nodes 492142 nps 2299728 hashfull 202 tbhits 0 time 214 pv g6g5
+info depth 7 seldepth 5 multipv 1 score cp -521 nodes 623068 nps 2265701 hashfull 238 tbhits 0 time 275 pv g6g5
+info depth 8 seldepth 5 multipv 1 score cp -519 nodes 701569 nps 2277821 hashfull 256 tbhits 0 time 308 pv g6g5
+info depth 9 seldepth 7 multipv 1 score cp -524 nodes 818913 nps 2274758 hashfull 296 tbhits 0 time 360 pv i6i5
+info depth 10 seldepth 6 multipv 1 score cp -518 nodes 944447 nps 2275775 hashfull 334 tbhits 0 time 415 pv a6a5
+info depth 11 seldepth 5 multipv 1 score cp -534 nodes 1074926 nps 2296850 hashfull 375 tbhits 0 time 468 pv i6i5
+info depth 12 seldepth 6 multipv 1 score cp -540 nodes 1362733 nps 2325482 hashfull 470 tbhits 0 time 586 pv a6a5
+info depth 13 seldepth 6 multipv 1 score cp -543 nodes 1564559 nps 2324753 hashfull 529 tbhits 0 time 673 pv a6a5
+info depth 14 seldepth 6 multipv 1 score cp -542 nodes 1804069 nps 2349048 hashfull 575 tbhits 0 time 768 pv a6a5
+info depth 15 seldepth 6 multipv 1 score cp -531 nodes 2082904 nps 2358894 hashfull 634 tbhits 0 time 883 pv i6i5 g3g4
+info depth 16 seldepth 6 multipv 1 score cp -539 nodes 2392312 nps 2361611 hashfull 691 tbhits 0 time 1013 pv i6i5 g3g4
+bestmove i6i5 ponder g3g4
