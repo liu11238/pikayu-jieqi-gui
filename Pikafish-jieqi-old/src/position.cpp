@@ -188,10 +188,14 @@ Position& Position::set(const string& fenStr, StateInfo* si, Thread* th) {
       }
   }
 
-    // 2. Active color
-    ss >> token;
-    sideToMove = (token == 'w' ? WHITE : BLACK);
-    ss >> token;
+  // 2. Active color
+  ss >> token;
+  sideToMove = (token == 'w' ? WHITE : BLACK);
+  // Jieqi analysis always evaluates positions from Red's perspective. Keep
+  // the reference side explicit instead of relying on Position being cleared
+  // to zero by memset() above (WHITE happens to be the zero-valued Color).
+  firstSideMove = WHITE;
+  ss >> token;
 
   //2.rest
   Piece pt = NO_PIECE;

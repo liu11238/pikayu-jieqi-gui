@@ -354,7 +354,7 @@ private:
 class ScoreCalc {
 public:
     ScoreCalc(int Ldepth, int depth, bool us, bool worst = false) :
-        _us(us), _worst(worst), _Ldepth(Ldepth), _depth(depth){}
+        _Ldepth(Ldepth), _depth(depth), _us(us), _worst(worst) {}
 
     void setUs(bool us) { _us = !us; }
 
@@ -377,10 +377,11 @@ public:
             return VALUE_ZERO;
 
         // Expected mode uses the remaining pool counts as probabilities and
-        // restores the moving-side perspective after aggregation.  Worst mode
-        // already aggregates directly in that perspective, so its minimum is
-        // returned without another sign conversion.
-        int v = _worst ? _min : (_totalScore / _totalCount);
+        // restores the moving-side perspective after aggregation.  In Worst
+        // mode, vTmp is in the moving side's perspective: choose its minimum
+        // when the moving side is the root side, but its maximum when the
+        // moving side is the opponent, since that is worst for the root side.
+        int v = _worst ? (_us ? _min : _max) : (_totalScore / _totalCount);
         v = std::clamp(v, -DARKVALRATE, DARKVALRATE);
         if (!_worst && !_us) v *= -1;
         assert(v > -VALUE_INFINITE && v < VALUE_INFINITE);
@@ -388,10 +389,10 @@ public:
     }
 
 private:
-    bool _us;
-    bool _worst;
     int _Ldepth;
     int _depth;
+    bool _us;
+    bool _worst;
     //int _typeScore[PIECE_NB] = { 0 };
     //int _typecount[PIECE_NB] = { 0 };
     int _totalScore = 0;
