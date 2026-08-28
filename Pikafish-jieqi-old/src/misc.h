@@ -353,18 +353,22 @@ private:
 
 class ScoreCalc {
 public:
-    ScoreCalc(int Ldepth, int depth, bool us, bool worst = false) :
-        _Ldepth(Ldepth), _depth(depth), _us(us), _worst(worst) {}
+    ScoreCalc(int Ldepth, int depth, bool movingSideIsFirst, bool worst = false) :
+        _Ldepth(Ldepth), _depth(depth), _movingSideIsFirst(movingSideIsFirst), _worst(worst) {}
 
-    void setUs(bool us) { _us = !us; }
+    // _us means that the hidden piece belongs to the search root side.
+    // vTmp is evaluated from the side that made the move's perspective.
+    void setUs(bool darkOwnerIsRootSide) { _us = darkOwnerIsRootSide; }
 
     void append(Piece, int score, int count) {
-        // vTmp is evaluated from the side that made the move's perspective.
-        // Expected mode keeps the historical normalization to the first side,
-        // then converts the result back in CalcEvg().  Worst mode must minimize
-        // directly in the moving side's perspective: normalizing first would
-        // turn the second side's minimum into a maximum after the sign flip.
-        if (!_worst && !_us) score *= -1;
+        // In Expected mode, normalize every result to the root side before
+        // averaging, then restore the moving-side perspective in CalcEvg().
+        // The historical reference side is the first (red) side, not the
+        // search root side, so this deliberately uses _movingSideIsFirst.
+        // In Worst mode, do not normalize: the moving side's minimum is the
+        // root side's worst result when it owns the hidden piece, while the
+        // moving side's maximum is worst for the root side otherwise.
+        if (!_worst && !_movingSideIsFirst) score *= -1;
         if (_min > score)_min = score;
         if (_max < score)_max = score;
         score = std::clamp(score, -DARKVALRATE, DARKVALRATE);
@@ -378,12 +382,10 @@ public:
 
         // Expected mode uses the remaining pool counts as probabilities and
         // restores the moving-side perspective after aggregation.  In Worst
-        // mode, vTmp is in the moving side's perspective: choose its minimum
-        // when the moving side is the root side, but its maximum when the
-        // moving side is the opponent, since that is worst for the root side.
+        // mode, choose the result that is worst for the search root side.
         int v = _worst ? (_us ? _min : _max) : (_totalScore / _totalCount);
         v = std::clamp(v, -DARKVALRATE, DARKVALRATE);
-        if (!_worst && !_us) v *= -1;
+        if (!_worst && !_movingSideIsFirst) v *= -1;
         assert(v > -VALUE_INFINITE && v < VALUE_INFINITE);
         return Value(v);
     }
@@ -391,7 +393,8 @@ public:
 private:
     int _Ldepth;
     int _depth;
-    bool _us;
+    bool _movingSideIsFirst;
+    bool _us = false;
     bool _worst;
     //int _typeScore[PIECE_NB] = { 0 };
     //int _typecount[PIECE_NB] = { 0 };

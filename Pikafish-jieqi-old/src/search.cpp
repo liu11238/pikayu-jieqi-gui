@@ -970,8 +970,11 @@ namespace {
                     
                     int tryTypeTimes = 0, typecount = 0;
                     bool isDarkDepth;
-                    ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
-                    SC.setUs(pos.isFirstSide());
+                    // do_move_temp() already toggled the side to move here.
+                    // Keep the historical Expected normalization anchored to
+                    // the side that made the move.
+                    ScoreCalc SC(Limits.depth, depth, !pos.isFirstSide(), dark_worst_mode());
+                    SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
                     while (pos.getDark(darkSt, typecount, isDarkDepth))
                     {
                         Value vTmp;
@@ -1334,7 +1337,7 @@ moves_loop: // When in check, search starts here
           int a = 0;
       }
       if (pos.do_move(move, st, givesCheck)) {
-          SC.setUs(pos.isFirstSide());
+          SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
           while (pos.getDark(darkSt, typecount, isDarkDepth))
           {
               fromWhile = true;
@@ -1880,7 +1883,7 @@ dark_undo:
       std::string cfen;
       if (pos.do_move(move, st, givesCheck)) {
           StateInfo darkSt;
-          SC.setUs(pos.isFirstSide());
+          SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
           while (pos.getDark(darkSt, typecount, isDarkDepth))
           {
               vTmp = -qsearch<nodeType>(pos, ss + 1, -beta, -alpha, isDarkDepth ? 0 : depth - 1);
