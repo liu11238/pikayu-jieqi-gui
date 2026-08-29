@@ -45,6 +45,24 @@ inline bool dark_worst_mode() {
     return Stockfish::Options["DarkSearchMode"] == "Worst";
 }
 
+// Keep the existing dark-depth limit as a recursion guard.  Worst mode gets
+// one extra ply at the limit so a consecutive dark move can still be seen,
+// but another dark branch at that extra ply is cut to qsearch instead of
+// recursing indefinitely.  Expected mode retains its historical cutoff.
+inline Depth dark_search_depth(Position& pos, Depth currentDepth, bool isDarkDepth, Depth normalDepth) {
+    if (!isDarkDepth)
+        return normalDepth;
+
+    // getDark() marks the branch at MAXDARKDEPTH as a dark-depth branch.  Give
+    // that branch one ordinary ply in Worst mode, but cut a subsequent dark
+    // branch (darkDepth > MAXDARKDEPTH) to qsearch.  This preserves the guard
+    // against an unbounded chain while allowing the boundary dark move itself
+    // to be searched.
+    return dark_worst_mode()
+        && currentDepth > 1
+        && pos.state()->darkDepth == MAXDARKDEPTH ? 1 : 0;
+}
+
 bool lastDarkWorst = false;
 
 }
@@ -982,7 +1000,8 @@ namespace {
                         vTmp = -qsearch<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1);
                         // If the qsearch held, perform the regular search
                         if (vTmp >= probCutBeta)
-                            vTmp = -search<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1, isDarkDepth ? 0 : depth - 4, !cutNode);
+                            vTmp = -search<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1,
+                                dark_search_depth(pos, depth, isDarkDepth, depth - 4), !cutNode);
 
                         SC.append(pos.piece_on(to_sq(move)), vTmp, typecount);
                         //get worse
@@ -1102,7 +1121,7 @@ moves_loop: // When in check, search starts here
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
-    while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
+    while ((move = mp.next_move(dark_worst_mode() ? false : moveCountPruning)) != MOVE_NONE)
     {
       assert(is_ok(move));
 
@@ -1129,9 +1148,6 @@ moves_loop: // When in check, search starts here
       else
       {
           darkPrint = false;
-      }
-      if (darkPrint) {
-          int a = 0;
       }
 #endif
       if (move == excludedMove)
@@ -1165,9 +1181,11 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       Value delta = beta - alpha;
+      const bool preserveDarkMove = dark_worst_mode() && pos.isDark(from_sq(move));
 
       // Step 13. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
-      if (  !rootNode
+      if (  !preserveDarkMove
+          && !rootNode
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold (~7 Elo)
@@ -1325,17 +1343,12 @@ moves_loop: // When in check, search starts here
       int darkTryTimes = 0;
       bool fromWhile = false;
       StateInfo darkSt;
-      std::string fen3, mvStr = UCI::move(move);
       int tryTypeTimes = 0, typecount = 0;
-       ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
+      ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
       bool isDarkDepth = false;
 #if SEARCHDEBUG
-      fen3 = pos.fen();
       std::string DarkSearchInfo = "";
 #endif
-      if (mvStr == "g4g9") {
-          int a = 0;
-      }
       if (pos.do_move(move, st, givesCheck)) {
           SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
           while (pos.getDark(darkSt, typecount, isDarkDepth))
@@ -1441,7 +1454,8 @@ dark_calc:
           // beyond the first move depth. This may lead to hidden double extensions.
           Depth d = std::clamp(newDepth - r, 1, newDepth + 1);
 
-          vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, isDarkDepth ? 0 : d, true);
+          vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha,
+              dark_search_depth(pos, depth, isDarkDepth, d), true);
 
           if (darkTryTimes == 0 || vTmp < value) value = vTmp;
           darkTryTimes++;
@@ -1455,7 +1469,8 @@ dark_calc:
               
               newDepth += doDeeperSearch - doShallowerSearch + doEvenDeeperSearch;
               if (newDepth > d)
-                  vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, isDarkDepth ? 0 : newDepth, !cutNode);
+                  vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha,
+                      dark_search_depth(pos, depth, isDarkDepth, newDepth), !cutNode);
 
               if (darkTryTimes == 0 || vTmp < value) value = vTmp;
 
@@ -1474,7 +1489,8 @@ dark_calc:
       // Step 17. Full depth search when LMR is skipped
       else if (!PvNode || moveCount > 1)
       {
-              vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, isDarkDepth ? 0 : newDepth, !cutNode);
+              vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha,
+                  dark_search_depth(pos, depth, isDarkDepth, newDepth), !cutNode);
 
               if (darkTryTimes == 0 || vTmp < value) value = vTmp;
 
@@ -1490,7 +1506,7 @@ dark_calc:
           (ss+1)->pv[0] = MOVE_NONE;
 
           vTmp = -search<PV>(pos, ss+1, -beta, -alpha,
-              isDarkDepth ? 0 : std::min(maxNextDepth, newDepth), false);
+              dark_search_depth(pos, depth, isDarkDepth, std::min(maxNextDepth, newDepth)), false);
           //get worse
           if (darkTryTimes == 0 || vTmp < value) value = vTmp;
           darkTryTimes++;
@@ -1878,15 +1894,15 @@ dark_undo:
       // Make and search the move
       Value vTmp;
       int tryTypeTimes = 0, typecount = 0;
-       ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
+      ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
       bool isDarkDepth;
-      std::string cfen;
       if (pos.do_move(move, st, givesCheck)) {
           StateInfo darkSt;
           SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
           while (pos.getDark(darkSt, typecount, isDarkDepth))
           {
-              vTmp = -qsearch<nodeType>(pos, ss + 1, -beta, -alpha, isDarkDepth ? 0 : depth - 1);
+              vTmp = -qsearch<nodeType>(pos, ss + 1, -beta, -alpha,
+                  isDarkDepth ? 0 : depth - 1);
               tryTypeTimes++;
               SC.append(pos.piece_on(to_sq(move)), vTmp, typecount);
               pos.setDark();

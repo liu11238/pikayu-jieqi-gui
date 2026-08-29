@@ -368,10 +368,25 @@ public:
         // In Worst mode, do not normalize: the moving side's minimum is the
         // root side's worst result when it owns the hidden piece, while the
         // moving side's maximum is worst for the root side otherwise.
+        //
+        // In Worst mode mate results are exempt from the DARKVALRATE clamp:
+        // they are kept in the encoded form sign * (30000 - plies), where
+        // plies is the remaining distance to mate (1 ply -> 29999,
+        // 2 plies -> 29998, ...; mated: negated).  The encoded range
+        // [30000 - MAX_PLY, 29999] sits far above every
+        // clamped cp score, so min/max aggregation keeps both "mate beats any
+        // material score" and "faster mate beats slower mate", and CalcEvg()
+        // converts the result back to the engine's VALUE_MATE - plies form
+        // before it returns to the search, where mate distance handling, TT
+        // storage and the GUI "score mate N" reporting all stay intact.
+        // Expected mode keeps its historical clamped-average behaviour.
         if (!_worst && !_movingSideIsFirst) score *= -1;
+        if (_worst && isMateScore(score))
+            score = mateToEncoded(score);
+        else
+            score = std::clamp(score, -DARKVALRATE, DARKVALRATE);
         if (_min > score)_min = score;
         if (_max < score)_max = score;
-        score = std::clamp(score, -DARKVALRATE, DARKVALRATE);
         _totalScore += score * count;
         _totalCount += count;
     }
@@ -384,13 +399,53 @@ public:
         // restores the moving-side perspective after aggregation.  In Worst
         // mode, choose the result that is worst for the search root side.
         int v = _worst ? (_us ? _min : _max) : (_totalScore / _totalCount);
-        v = std::clamp(v, -DARKVALRATE, DARKVALRATE);
-        if (!_worst && !_movingSideIsFirst) v *= -1;
+        if (_worst)
+        {
+            // Decode the mate result into the engine's native form so that
+            // mate-distance semantics survive in alpha-beta, the TT and the
+            // GUI output; non-mate results are already clamped in append().
+            if (isEncodedMate(v))
+                v = encodedToMate(v);
+        }
+        else
+        {
+            v = std::clamp(v, -DARKVALRATE, DARKVALRATE);
+            if (!_movingSideIsFirst) v *= -1;
+        }
         assert(v > -VALUE_INFINITE && v < VALUE_INFINITE);
         return Value(v);
     }
 
 private:
+    // Engine mate scores are VALUE_MATE - plies (mated: negated) with plies
+    // in [1, MAX_PLY].
+    static bool isMateScore(int score) {
+        int a = std::abs(score);
+        return a >= VALUE_MATE_IN_MAX_PLY && a <= VALUE_MATE;
+    }
+
+    // Encoded mate range is [30000 - MAX_PLY, 29999]; every clamped
+    // cp score is at most DARKVALRATE, so the two ranges cannot overlap.
+    static bool isEncodedMate(int score) {
+        int a = std::abs(score);
+        return a >= 30000 - MAX_PLY && a <= 29999;
+    }
+
+    // VALUE_MATE - plies  ->  sign * (30000 - plies)
+    static int mateToEncoded(int score) {
+        int sign = score < 0 ? -1 : 1;
+        int plies = VALUE_MATE - std::abs(score);
+        if (plies < 1) plies = 1;
+        return sign * (30000 - plies);
+    }
+
+    // sign * (30000 - plies)  ->  VALUE_MATE - plies
+    static int encodedToMate(int score) {
+        int sign = score < 0 ? -1 : 1;
+        int plies = 30000 - std::abs(score);
+        return sign * (VALUE_MATE - plies);
+    }
+
     int _Ldepth;
     int _depth;
     bool _movingSideIsFirst;
