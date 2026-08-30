@@ -65,6 +65,9 @@ public:
   Value bestValue, optimism[COLOR_NB];
 
   Position rootPos;
+  // Fixed side at the start of the current search. rootPos is mutated while
+  // searching, so rootPos.side_to_move() cannot be used as the root side.
+  Color rootSide = WHITE;
   StateInfo rootState;
   Search::RootMoves rootMoves;
   Depth rootDepth, completedDepth, previousDepth;

@@ -377,7 +377,9 @@ void Thread::search() {
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1, totBestMoveChanges = 0;
-  Color us = rootPos.side_to_move();
+  // Keep this side fixed: rootPos is changed by do_move() during the search.
+  rootSide = rootPos.side_to_move();
+  Color us = rootSide;
   int iterIdx = 0;
 
   // A DarkSearchMode change invalidates the transposition table, because the
@@ -992,7 +994,7 @@ namespace {
                     // Keep the historical Expected normalization anchored to
                     // the side that made the move.
                     ScoreCalc SC(Limits.depth, depth, !pos.isFirstSide(), dark_worst_mode());
-                    SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
+                    SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootSide);
                     while (pos.getDark(darkSt, typecount, isDarkDepth))
                     {
                         Value vTmp;
@@ -1340,30 +1342,38 @@ moves_loop: // When in check, search starts here
       //pos.do_move(move, st, givesCheck);
 
       Value vTmp = value;
-      int darkTryTimes = 0;
       bool fromWhile = false;
       StateInfo darkSt;
       int tryTypeTimes = 0, typecount = 0;
       ScoreCalc SC(Limits.depth, depth, pos.isFirstSide(), dark_worst_mode());
       bool isDarkDepth = false;
+      // Each possible identity of a dark piece is an independent branch.
+      // Do not carry either its score or its LMR-adjusted depth to the next
+      // identity; ScoreCalc is the sole authority for branch aggregation.
+      Value branchValue = VALUE_NONE;
+      const Depth baseNewDepth = newDepth;
+      Depth branchNewDepth = baseNewDepth;
 #if SEARCHDEBUG
       std::string DarkSearchInfo = "";
 #endif
       if (pos.do_move(move, st, givesCheck)) {
-          SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
+          SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootSide);
           while (pos.getDark(darkSt, typecount, isDarkDepth))
           {
+              branchValue = VALUE_NONE;
+              branchNewDepth = baseNewDepth;
               fromWhile = true;
               goto dark_calc;
 dark_while:              
               tryTypeTimes++;
-              SC.append(pos.piece_on(to_sq(move)), vTmp, typecount);
+              assert(branchValue != VALUE_NONE);
+              SC.append(pos.piece_on(to_sq(move)), branchValue, typecount);
 #if SEARCHDEBUG
               if (darkPrint) {
                   if (!DarkSearchInfo.empty())DarkSearchInfo.append(",");
                   DarkSearchInfo.append(std::to_string(pos.piece_on(to_sq(move))));
                   DarkSearchInfo.append(" ");
-                  DarkSearchInfo.append(std::to_string(vTmp));
+                  DarkSearchInfo.append(std::to_string(branchValue));
                   DarkSearchInfo.append(" ");
                   DarkSearchInfo.append(std::to_string(typecount));
                   DarkSearchInfo.append(" ");
@@ -1373,7 +1383,7 @@ dark_while:
               pos.setDark();
           }
           fromWhile = false;
-          if (darkTryTimes == 0) {
+          if (tryTypeTimes == 0) {
               pos.undo_move(move);
               continue;
           }
@@ -1392,6 +1402,9 @@ dark_while:
       }
       else
       {
+          // No hidden identity was generated: the ordinary move still starts
+          // with an empty branch accumulator so its first search result
+          // replaces the previous move's value, as in the original search.
           goto dark_calc;
       }
 
@@ -1452,32 +1465,29 @@ dark_calc:
           // In general we want to cap the LMR depth search at newDepth, but when
           // reduction is negative, we allow this move a limited search extension
           // beyond the first move depth. This may lead to hidden double extensions.
-          Depth d = std::clamp(newDepth - r, 1, newDepth + 1);
+          Depth d = std::clamp(branchNewDepth - r, 1, branchNewDepth + 1);
 
           vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha,
               dark_search_depth(pos, depth, isDarkDepth, d), true);
 
-          if (darkTryTimes == 0 || vTmp < value) value = vTmp;
-          darkTryTimes++;
+          if (branchValue == VALUE_NONE || vTmp < branchValue) branchValue = vTmp;
 
           // Do full depth search when reduced LMR search fails high
-          if (value > alpha && d < newDepth)
+          if (branchValue > alpha && d < branchNewDepth)
           {
-              const bool doDeeperSearch = value > (alpha + lmrse_1 + lmrse_2 * (newDepth - d));
-              const bool doEvenDeeperSearch = value > (alpha + lmrse_3 + lmrse_4 * (newDepth - d));
-              const bool doShallowerSearch = value < bestValue + newDepth;
+              const bool doDeeperSearch = branchValue > (alpha + lmrse_1 + lmrse_2 * (branchNewDepth - d));
+              const bool doEvenDeeperSearch = branchValue > (alpha + lmrse_3 + lmrse_4 * (branchNewDepth - d));
+              const bool doShallowerSearch = branchValue < bestValue + branchNewDepth;
               
-              newDepth += doDeeperSearch - doShallowerSearch + doEvenDeeperSearch;
-              if (newDepth > d)
+              branchNewDepth += doDeeperSearch - doShallowerSearch + doEvenDeeperSearch;
+              if (branchNewDepth > d)
                   vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha,
-                      dark_search_depth(pos, depth, isDarkDepth, newDepth), !cutNode);
+                      dark_search_depth(pos, depth, isDarkDepth, branchNewDepth), !cutNode);
 
-              if (darkTryTimes == 0 || vTmp < value) value = vTmp;
+              if (branchValue == VALUE_NONE || vTmp < branchValue) branchValue = vTmp;
 
-              darkTryTimes++;
-
-              int bonus = value > alpha ?  stat_bonus(newDepth)
-                                        : -stat_bonus(newDepth);
+              int bonus = branchValue > alpha ?  stat_bonus(branchNewDepth)
+                                               : -stat_bonus(branchNewDepth);
 
               if (capture)
                   bonus /= lmrse_5;
@@ -1490,32 +1500,30 @@ dark_calc:
       else if (!PvNode || moveCount > 1)
       {
               vTmp = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha,
-                  dark_search_depth(pos, depth, isDarkDepth, newDepth), !cutNode);
+                  dark_search_depth(pos, depth, isDarkDepth, branchNewDepth), !cutNode);
 
-              if (darkTryTimes == 0 || vTmp < value) value = vTmp;
-
-              darkTryTimes++;
+              if (branchValue == VALUE_NONE || vTmp < branchValue) branchValue = vTmp;
       }
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
       // parent node fail low with value <= alpha and try another move.
-      if (PvNode && (moveCount == 1 || (value > alpha && (rootNode || value < beta))))
+      if (PvNode && (moveCount == 1 || (branchValue > alpha && (rootNode || branchValue < beta))))
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
           vTmp = -search<PV>(pos, ss+1, -beta, -alpha,
-              dark_search_depth(pos, depth, isDarkDepth, std::min(maxNextDepth, newDepth)), false);
+              dark_search_depth(pos, depth, isDarkDepth, std::min(maxNextDepth, branchNewDepth)), false);
           //get worse
-          if (darkTryTimes == 0 || vTmp < value) value = vTmp;
-          darkTryTimes++;
+          if (branchValue == VALUE_NONE || vTmp < branchValue) branchValue = vTmp;
       }
       if (fromWhile) {
           goto dark_while;
       }
 dark_undo:
-      if (darkTryTimes == 0)value = vTmp;
+      if (tryTypeTimes == 0)
+          value = branchValue;
       // Step 18. Undo move
       pos.undo_move(move);
 
@@ -1898,7 +1906,7 @@ dark_undo:
       bool isDarkDepth;
       if (pos.do_move(move, st, givesCheck)) {
           StateInfo darkSt;
-          SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootPos.side_to_move());
+          SC.setUs(color_of(pos.piece_on(to_sq(move))) == thisThread->rootSide);
           while (pos.getDark(darkSt, typecount, isDarkDepth))
           {
               vTmp = -qsearch<nodeType>(pos, ss + 1, -beta, -alpha,
