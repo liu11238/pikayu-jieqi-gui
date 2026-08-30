@@ -110,7 +110,7 @@ setoption name DarkSearchMode value Expected
 Available values are:
 
 - **`Expected`** (default): aggregates possible hidden-piece identities according to the remaining-piece pool and evaluates their expected score. Its historical score normalization remains anchored to the first side/red side, so changing the search root side does not change Expected semantics.
-- **`Worst`**: searches from the root side's perspective. If a hidden piece belongs to the root side, the possible reveal results are minimized; if it belongs to the opponent, the possible results are maximized from the moving side's perspective, representing the opponent's best result and the root side's worst case.
+- **`Worst`**: searches from the root side's perspective. The root side is fixed to the side to move when the search starts and does not change as recursive moves are searched. If a hidden piece belongs to the root side, the possible reveal results are minimized; if it belongs to the opponent, the possible results are maximized from the moving side's perspective, representing the opponent's best result and the root side's worst case. Each possible hidden-piece identity is searched as an independent branch before the worst-case results are aggregated.
 
 Changing this option clears the transposition table because the two aggregation models produce different scores for the same position.
 
@@ -143,6 +143,7 @@ The GUI currently supports:
 - displaying depth, score, PV, and the first move as a board arrow;
 - temporarily banning the current recommendation (**强制变招**), with **清除禁用** to restore choices;
 - undo, redo, board rotation, search depth, Threads, Hash, MultiPV, and engine-path settings;
+- selecting the hidden-piece search mode in **设置引擎**: `Expected` (default) or `Worst`;
 - selecting a revealed piece after a capture or hidden-piece move;
 - automatic restart of analysis after the position changes.
 
