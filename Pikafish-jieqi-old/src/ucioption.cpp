@@ -75,6 +75,7 @@ void init(OptionsMap& o) {
   o["UCI_AnalyseMode"]       << Option(false);
   o["UCI_ShowWDL"]           << Option(false);
   o["DarkSearchMode"]        << Option("Expected Worst", "Expected", on_dark_search_mode);
+  o["JieQi GUI Info"]        << Option(false);
   o["EvalFile"]              << Option(EvalFileDefaultName, on_eval_file);
 }
 

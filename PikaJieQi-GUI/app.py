@@ -12,8 +12,14 @@ import subprocess
 import threading
 import time
 import tkinter as tk
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from pathlib import Path
 from tkinter import filedialog, messagebox, simpledialog, ttk
+
+from engine.cache import AnalysisCache, CacheKey
+from engine.config import AppConfig
+from engine.protocol import InfoLine, parse_engine_line
+from engine.state import AnalysisSnapshot
 
 
 START_FEN = "xxxxkxxxx/9/1x5x1/x1x1x1x1x/9/9/X1X1X1X1X/1X5X1/9/XXXXKXXXX w R2A2C2P5N2B2r2a2c2p5n2b2 0 1"
@@ -39,6 +45,11 @@ DARK_SQUARE_TYPES = (
     "RNBA.ABNR",
 )
 ENGINE_DEFAULT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Pikafish-jieqi-old", "src", "PikaJieQi.exe"))
+
+
+def config_path() -> Path:
+    root = Path(os.environ.get("APPDATA", Path.home()))
+    return root / "PikaJieQi" / "gui.json"
 
 
 def parse_board(fen: str) -> list[list[str]]:
@@ -194,13 +205,20 @@ class App(tk.Tk):
         self.title("PikaJieQi 暗棋局面分析")
         self.geometry("1100x760"); self.minsize(900, 650)
         self.q: queue.Queue[str] = queue.Queue(); self.engine: Engine | None = None
+        self.config_file = config_path()
+        self.config = AppConfig.load(self.config_file)
         self.board = parse_board(START_FEN); self.side = "w"; self.tail = "R2A2C2P5N2B2r2a2c2p5n2b2 0 1"
         self.pool = parse_pool(self.tail); self.captured = {f"{color}{piece}": 0 for color in "wb" for piece in DARK_PIECES}; self.unknown_captured = {"w": 0, "b": 0}
         self.base_board = [r[:] for r in self.board]; self.base_side = self.side; self.base_tail = self.tail
         self.base_pool = copy_pool(self.pool); self.base_captured = self.captured.copy(); self.base_unknown_captured = self.unknown_captured.copy()
         self.moves: list[str] = []; self.redo: list[Snapshot] = []; self.selected: tuple[int, int] | None = None
-        self.depth = tk.IntVar(value=4); self.engine_path = tk.StringVar(value=ENGINE_DEFAULT)
-        self.flipped = False; self.analyzing = False; self.analysis_requested = False; self.pending_analysis = False; self.waiting_for_stop = False; self.position_pending = False; self.restart_scheduled = False; self.restart_waiting_ready = False; self.engine_ready = False; self.analysis_timer = None; self.pv: list[str] = []; self.recommend = ""; self.analysis_depth = 0; self.restart_count = 0; self.last_engine_death = 0.0
+        self.depth = tk.IntVar(value=self.config.start_depth); self.engine_path = tk.StringVar(value=self.config.engine_path or ENGINE_DEFAULT)
+        self.flipped = False; self.analyzing = False; self.analysis_requested = False; self.pending_analysis = False; self.waiting_for_stop = False; self.position_pending = False; self.restart_scheduled = False; self.restart_waiting_ready = False; self.engine_ready = False; self.analysis_timer = None; self.analysis_ui_timer = None; self.pv: list[str] = []; self.recommend = ""; self.analysis_depth = 0; self.restart_count = 0; self.last_engine_death = 0.0
+        self.analysis_generation = 0
+        self.analysis_snapshot = AnalysisSnapshot(0)
+        self.cache = AnalysisCache(self.config.cache_size)
+        self.active_cache_key: CacheKey | None = None
+        self.identity_enabled = self.config.show_identity
         self.banned_moves: list[str] = []
         self.ban_mode = "probing"
         self.ban_probe_stage = "idle"
@@ -237,6 +255,16 @@ class App(tk.Tk):
         ttk.Label(right, textvariable=self.captured_text, justify="left", foreground="#555").pack(anchor="w", pady=(4, 0))
         ttk.Label(right, text="走法记录", font=("Segoe UI", 12, "bold")).pack(anchor="w", pady=(15, 2))
         self.history = tk.Listbox(right, height=18); self.history.pack(fill="both", expand=True)
+        ttk.Label(right, text="候选主变化", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(8, 2))
+        self.multipv_view = ttk.Treeview(right, columns=("rank", "move", "score"), show="headings", height=4)
+        for column, title, width in (("rank", "序", 35), ("move", "走法", 75), ("score", "评分", 90)):
+            self.multipv_view.heading(column, text=title); self.multipv_view.column(column, width=width, anchor="center")
+        self.multipv_view.pack(fill="x")
+        ttk.Label(right, text="暗子身份（JQ，可选）", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(8, 2))
+        self.identity_view = ttk.Treeview(right, columns=("piece", "score", "count"), show="headings", height=6)
+        for column, title, width in (("piece", "身份", 55), ("score", "分数", 90), ("count", "池数量", 60)):
+            self.identity_view.heading(column, text=title); self.identity_view.column(column, width=width, anchor="center")
+        self.identity_view.pack(fill="x")
         ttk.Label(self, textvariable=self.status, relief="sunken", anchor="w").pack(fill="x", side="bottom")
 
     def _start_engine(self):
@@ -244,8 +272,18 @@ class App(tk.Tk):
             self.status.set("未找到引擎，请在“设置引擎”中选择 PikaJieQi.exe"); return
         try:
             self.engine = Engine(self.engine_path.get(), self.q); self.engine.start()
+            self._send_engine_options()
             self._begin_ban_probe()
         except OSError as e: messagebox.showerror("引擎启动失败", str(e))
+
+    def _send_engine_options(self):
+        if not self.engine:
+            return
+        self.engine.send(f"setoption name Threads value {self.config.threads}")
+        self.engine.send(f"setoption name Hash value {self.config.hash_mb}")
+        self.engine.send(f"setoption name MultiPV value {self.config.multipv}")
+        self.engine.send(f"setoption name DarkSearchMode value {self.config.dark_mode}")
+        self.engine.send(f"setoption name JieQi GUI Info value {'true' if self.identity_enabled else 'false'}")
 
     def position_command(self) -> str:
         """把 GUI 当前正在显示的局面原样发送给引擎。
@@ -480,6 +518,17 @@ class App(tk.Tk):
             # 的暗棋细节存在差异时误把正常局面判成无路可走。
             self.engine.send("go infinite")
         return True
+
+    def _analysis_cache_key(self) -> CacheKey:
+        options = (
+            ("DarkSearchMode", self.config.dark_mode),
+            ("MultiPV", str(self.config.multipv)),
+            ("Threads", str(self.config.threads)),
+            ("Hash", str(self.config.hash_mb)),
+            ("JieQi GUI Info", str(self.identity_enabled)),
+            ("banmoves", " ".join(self.banned_moves)),
+        )
+        return CacheKey(self.position_command(), options, int(self.depth.get()))
 
     def set_new_base(self, board: list[list[str]], side: str, tail: str, pool: dict[str, int],
                      captured: dict[str, int] | None = None,
@@ -885,15 +934,89 @@ class App(tk.Tk):
     def clear_analysis(self):
         """清掉旧局面的分析结果，避免旧箭头短暂残留在新局面上。"""
         self.pv = []; self.recommend = ""; self.analysis_depth = 0
+        self.analysis_generation += 1
+        self.analysis_snapshot = AnalysisSnapshot(self.analysis_generation)
         self.score.set("层数：— | 评分：— | 棋谱：—")
+        self._clear_analysis_views()
         self.draw()
+
+    def _clear_analysis_views(self):
+        if hasattr(self, "multipv_view"):
+            for item in self.multipv_view.get_children():
+                self.multipv_view.delete(item)
+        if hasattr(self, "identity_view"):
+            for item in self.identity_view.get_children():
+                self.identity_view.delete(item)
+
+    def _queue_analysis_snapshot(self, snapshot: AnalysisSnapshot):
+        """只保留最新快照，避免 stdout 高频输出拖垮 Tk 主线程。"""
+        if snapshot.generation != self.analysis_generation:
+            return
+        self.analysis_snapshot = snapshot
+        if self.analysis_ui_timer is None:
+            self.analysis_ui_timer = self.after(80, self._apply_analysis_snapshot)
+
+    def _apply_analysis_snapshot(self):
+        self.analysis_ui_timer = None
+        snapshot = self.analysis_snapshot
+        if snapshot.generation != self.analysis_generation:
+            return
+        self.analysis_depth = snapshot.depth
+        self.pv = list(snapshot.pv)
+        self.recommend = snapshot.recommend
+        score = "—" if snapshot.score is None else f"{snapshot.score_kind} {snapshot.score}"
+        pv = " ".join(snapshot.pv) if snapshot.pv else "—"
+        self.score.set(f"层数：{snapshot.depth or '—'} | 评分：{score} | 棋谱：{pv}")
+        self._refresh_analysis_views(snapshot)
+        self.draw()
+
+    def _refresh_analysis_views(self, snapshot: AnalysisSnapshot):
+        self._clear_analysis_views()
+        for rank, pv, score, kind in snapshot.multipv:
+            move = pv[0] if pv else "—"
+            value = "—" if score is None else f"{kind} {score}"
+            self.multipv_view.insert("", "end", values=(rank, move, value))
+        # Keep a fixed six-row view so a partial JQ message never implies that
+        # the missing identities were searched and scored as zero.
+        identity = next((item for item in snapshot.identities if item.move == snapshot.recommend), None)
+        labels = {piece: LABEL[piece] for piece in DARK_PIECES}
+        if not self.identity_enabled:
+            self.identity_view.insert("", "end", values=("—", "设置中未启用", "—"))
+            return
+        if identity is None:
+            self.identity_view.insert("", "end", values=("—", "暂无 JQ 数据", "—"))
+            return
+        for piece in DARK_PIECES:
+            value = identity.identities.get(piece)
+            if isinstance(value, dict):
+                score = value.get("score", "—")
+                count = value.get("count", "—")
+            else:
+                score, count = value if value is not None else "—", "—"
+            self.identity_view.insert("", "end", values=(labels[piece], score, count))
 
     def defer_analysis_restart(self):
         """stop 是异步的，必须等旧搜索输出 bestmove 后才能重新 go。"""
         if self.ban_mode == "probing":
             self._cancel_ban_probe()
-        self.pending_analysis = True
         self.analysis_requested = True
+        active_search = self.analyzing or self.waiting_for_stop or self.ban_probe_stage in ("baseline", "banned", "cancelled")
+        if not active_search:
+            # There is no search that can produce a bestmove (for example an
+            # outstanding isready during capability probing).  Do not enter a
+            # state that waits forever for a terminator which cannot arrive.
+            self.pending_analysis = False
+            self.waiting_for_stop = False
+            self.position_pending = False
+            self.restart_waiting_ready = False
+            if not self.engine.ready:
+                self.pending_analysis = True
+            if self.analysis_timer is not None:
+                self.after_cancel(self.analysis_timer)
+            self.analysis_timer = self.after(250, self._restart_after_position_change)
+            self.status.set("正在合并局面变化…")
+            return
+        self.pending_analysis = True
         self.waiting_for_stop = True
         self.position_pending = True
         self.restart_scheduled = False
@@ -906,14 +1029,19 @@ class App(tk.Tk):
         # 写入造成竞态。
         if self.analysis_timer is not None:
             self.after_cancel(self.analysis_timer)
-        self.analysis_timer = self.after(120, self._restart_after_position_change)
+        self.analysis_timer = self.after(250, self._restart_after_position_change)
 
     def _restart_after_position_change(self):
         self.analysis_timer = None
         if not self.analysis_requested or not self.engine or not self.engine.ready:
             return
+        # 250ms is only a debounce window.  The old search owns the UCI input
+        # loop until its real bestmove; never send a new position while it is
+        # still searching, otherwise late info can belong to either position.
+        if self.waiting_for_stop or self.position_pending:
+            self.status.set("等待旧搜索返回 bestmove…")
+            return
         self.position_pending = True
-        self.waiting_for_stop = False
         self.pending_analysis = False
         self.restart_scheduled = True
         # 这里明确发送新局面；position_pending 仍为 True，避免 sync()
@@ -922,6 +1050,7 @@ class App(tk.Tk):
             self.engine.send(self.position_command())
         self.clear_analysis()
         self.restart_waiting_ready = True
+        self.active_cache_key = self._analysis_cache_key()
         self.engine.send("isready")
         self.restart_scheduled = False
         self.status.set("正在准备新局面分析…")
@@ -955,6 +1084,10 @@ class App(tk.Tk):
         self.position_pending = False
         self.restart_scheduled = True
         self.clear_analysis(); self.score.set("层数：计算中 | 评分：计算中… | 棋谱：计算中…")
+        cached = self.cache.get(self._analysis_cache_key())
+        if cached is not None:
+            self._queue_analysis_snapshot(replace(cached, generation=self.analysis_generation, complete=False))
+        self.active_cache_key = self._analysis_cache_key()
         self.analyzing = self._send_go()
         if not self.analyzing:
             self.restart_scheduled = False
@@ -974,7 +1107,7 @@ class App(tk.Tk):
             self.after_cancel(self.analysis_timer); self.analysis_timer = None
         self.restart_waiting_ready = False
         self.waiting_for_stop = was_searching
-        self.position_pending = False
+        self.position_pending = was_searching
         self.restart_scheduled = False
         self.restart_waiting_ready = False
         self.analyzing = False; self.analysis_button.configure(text="开始持续分析")
@@ -1011,6 +1144,7 @@ class App(tk.Tk):
             try:
                 self.engine = Engine(self.engine_path.get(), self.q)
                 self.engine.start()
+                self._send_engine_options()
                 # 引擎重启后重新确认扩展能力；禁用列表不随引擎
                 # 进程丢失，但能力模式不能盲目沿用。
                 self._begin_ban_probe()
@@ -1054,14 +1188,17 @@ class App(tk.Tk):
         return result[0]
 
     def _poll(self):
-        while True:
-            try: line = self.q.get_nowait().strip()
-            except queue.Empty: break
-            if line.startswith("__ENGINE_DIED__"):
-                exit_code = line.partition(":")[2] or "未知"
-                self.handle_engine_death(exit_code)
+        """批量处理引擎事件；分析结果只通过快照节流刷新 Tk。"""
+        for _ in range(512):
+            try:
+                line = self.q.get_nowait().strip()
+            except queue.Empty:
+                break
+            event = parse_engine_line(line)
+            if event.kind == "died":
+                self.handle_engine_death(event.value or "未知")
                 continue
-            if line == "readyok":
+            if event.kind == "ready":
                 if self.engine:
                     self.engine.ready = True
                 if self.ban_probe_stage == "waiting_ready":
@@ -1075,43 +1212,30 @@ class App(tk.Tk):
                     if self.analyzing:
                         self.analysis_button.configure(text="停止分析")
                         self.status.set("持续分析中（实时加深，不会自动落子）")
-                elif self.pending_analysis:
+                elif self.pending_analysis and not self.waiting_for_stop:
                     self.after(0, self._resume_after_restart)
                 continue
             if self._handle_ban_probe_line(line):
                 continue
-            depth_match = re.search(r"\bdepth\s+(\d+)", line)
-            score_match = re.search(r"\bscore\s+(cp|mate)\s+(-?\d+)", line)
-            pv_match = re.search(r"\bpv\s+(.+)$", line)
-            # position_pending 表示这是上一个局面的搜索尚未返回 bestmove；
-            # 该期间的 info 不能污染新行棋方的推荐。
-            if position_pending := self.position_pending:
-                if line.startswith("bestmove "):
-                    pass
-                else:
-                    continue
-            if depth_match and score_match and pv_match:
-                self.analysis_depth = int(depth_match.group(1))
-                self.pv = pv_match.group(1).split()
-                self.recommend = self.pv[0] if self.pv else ""
-                if self.ban_mode == "banmoves" and self.recommend in self.banned_moves:
-                    # 持续搜索期间不会立即输出 bestmove；若实时 PV 已经
-                    # 暴露出被禁走法，说明扩展命令被忽略，马上切白名单。
+            # A changed position invalidates all info until the old search has
+            # acknowledged stop with its real bestmove.
+            if self.position_pending and event.kind != "bestmove":
+                continue
+            if event.kind == "info" and event.info is not None:
+                snapshot = self.analysis_snapshot.merge_info(event.info)
+                self._queue_analysis_snapshot(snapshot)
+                if self.ban_mode == "banmoves" and snapshot.recommend in self.banned_moves:
                     self._switch_to_searchmoves("banmoves 未生效，已切换到 searchmoves")
-                    continue
-                self.score.set(f"层数：{self.analysis_depth} | 评分：{score_match.group(1)} {score_match.group(2)} | 棋谱：{' '.join(self.pv)}")
-                self.draw()
-            elif depth_match and score_match:
-                self.analysis_depth = int(depth_match.group(1))
-                self.score.set(f"层数：{self.analysis_depth} | 评分：{score_match.group(1)} {score_match.group(2)} | 棋谱：—")
-                self.draw()
-            if line.startswith("bestmove "):
-                parts = line.split()
-                if not position_pending:
-                    self.recommend = parts[1] if len(parts) > 1 else ""
-                    if self.recommend == "(none)":
-                        self.recommend = ""
-                        self.pv = []
+            elif event.kind == "jq" and event.jq is not None:
+                self._queue_analysis_snapshot(self.analysis_snapshot.merge_jq(event.jq))
+            elif event.kind == "bestmove":
+                if self.active_cache_key is not None and self.analysis_snapshot.depth:
+                    completed = replace(self.analysis_snapshot, complete=True)
+                    self.cache.put(self.active_cache_key, completed)
+                    self.active_cache_key = None
+                if not self.position_pending:
+                    move = event.value
+                    if move == "(none)" or not move:
                         self.clear_analysis()
                         self.analyzing = False
                         self.analysis_requested = False
@@ -1119,50 +1243,64 @@ class App(tk.Tk):
                         self.analysis_button.configure(text="开始持续分析")
                         self.status.set("当前局面没有可用推荐走法")
                         continue
-                    if self.ban_mode == "banmoves" and self.recommend in self.banned_moves:
-                        # 某些兼容引擎会静默忽略未知的 banmoves 命令；
-                        # 一旦实际输出被禁走法，立即改用 searchmoves 白名单。
+                    if self.ban_mode == "banmoves" and move in self.banned_moves:
                         self._switch_to_searchmoves("banmoves 未生效，已切换到 searchmoves")
                         continue
-                    # 某些搜索结束路径可能只返回 bestmove，未返回带 pv
-                    # 的 info 行。推荐走法仍应立即绘制箭头。
-                    if self.recommend:
-                        self.pv = [self.recommend]
-                        self.draw()
+                    if not self.recommend:
+                        self._queue_analysis_snapshot(
+                            self.analysis_snapshot.merge_info(InfoLine(pv=(move,))))
+                    if not self.analysis_requested:
+                        completed = replace(self.analysis_snapshot, complete=True)
+                        self._queue_analysis_snapshot(completed)
+                        self.cache.put(self._analysis_cache_key(), completed)
                 if self.pending_analysis:
                     self.pending_analysis = False
                     self.waiting_for_stop = False
                     self.position_pending = False
                     self.restart_scheduled = False
-                    # 局面变化时由 _restart_after_position_change 负责发送
-                    # 新 position/isready/go；旧 bestmove 不能抢先启动搜索。
-                    if self.analysis_timer is None and not self.restart_waiting_ready:
-                        self.after(20, self.start_analysis)
+                    if self.analysis_timer is None and self.analysis_requested:
+                        self.after(0, self._restart_after_position_change)
                 elif not self.analyzing:
                     self.waiting_for_stop = False
+                    self.position_pending = False
                     self.status.set("推荐完成（未执行）")
-        self.after(80, self._poll)
+        self.after(50, self._poll)
 
     def settings(self):
         win = tk.Toplevel(self); win.title("引擎参数"); win.transient(self); win.grab_set()
         ttk.Label(win, text="引擎文件").grid(row=0, column=0, sticky="w", padx=8, pady=8); ttk.Entry(win, textvariable=self.engine_path, width=55).grid(row=0, column=1)
         ttk.Button(win, text="浏览", command=lambda: self.engine_path.set(filedialog.askopenfilename(filetypes=[("Executable", "*.exe"), ("All", "*")]))).grid(row=0, column=2)
-        vars_ = {"Threads": tk.IntVar(value=1), "Hash": tk.IntVar(value=16), "MultiPV": tk.IntVar(value=1)}
-        self.dark_mode = tk.StringVar(value="Expected")
+        vars_ = {"Threads": tk.IntVar(value=self.config.threads), "Hash": tk.IntVar(value=self.config.hash_mb), "MultiPV": tk.IntVar(value=self.config.multipv)}
+        dark_mode = tk.StringVar(value=self.config.dark_mode)
+        show_identity = tk.BooleanVar(value=self.identity_enabled)
         for i, (name, var) in enumerate(vars_.items(), 1):
             ttk.Label(win, text=name).grid(row=i, column=0, sticky="w", padx=8); ttk.Spinbox(win, from_=1, to=1024, textvariable=var, width=8).grid(row=i, column=1, sticky="w")
         ttk.Label(win, text="暗子搜索模式").grid(row=4, column=0, sticky="w", padx=8)
-        ttk.Combobox(win, textvariable=self.dark_mode, values=("Expected", "Worst"), state="readonly", width=10).grid(row=4, column=1, sticky="w", pady=3)
+        ttk.Combobox(win, textvariable=dark_mode, values=("Expected", "Worst"), state="readonly", width=10).grid(row=4, column=1, sticky="w", pady=3)
+        ttk.Checkbutton(win, text="启用六种暗子身份 JQ 输出", variable=show_identity).grid(row=5, column=1, sticky="w", pady=3)
         def apply():
+            try:
+                self.config.engine_path = self.engine_path.get()
+                self.config.threads = int(vars_["Threads"].get())
+                self.config.hash_mb = int(vars_["Hash"].get())
+                self.config.multipv = int(vars_["MultiPV"].get())
+                self.config.dark_mode = dark_mode.get()
+                self.config.show_identity = bool(show_identity.get())
+                self.config.start_depth = int(self.depth.get())
+                self.identity_enabled = self.config.show_identity
+                self.config.save(self.config_file)
+            except (TypeError, ValueError, OSError) as exc:
+                messagebox.showerror("设置错误", f"无法保存设置：{exc}", parent=win)
+                return
             if self.engine:
                 # Switching options while `go infinite` is running must stop the
                 # current search first; the engine's UCI loop is single-threaded.
                 if self.analysis_requested:
                     self.defer_analysis_restart()
-                for n, v in vars_.items(): self.engine.send(f"setoption name {n} value {v.get()}")
-                self.engine.send(f"setoption name DarkSearchMode value {self.dark_mode.get()}")
+                self._send_engine_options()
+            self._refresh_analysis_views(self.analysis_snapshot)
             win.destroy()
-        ttk.Button(win, text="应用", command=apply).grid(row=5, column=1, pady=10)
+        ttk.Button(win, text="应用", command=apply).grid(row=6, column=1, pady=10)
 
     def refresh(self, status=None):
         self.turn.set("当前行棋：红方" if self.side == "w" else "当前行棋：黑方")

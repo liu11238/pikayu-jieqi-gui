@@ -75,6 +75,11 @@ struct RootMove {
   Value averageScore = -VALUE_INFINITE;
   int selDepth = 0;
   std::vector<Move> pv;
+  // Optional GUI-only dark identity scores for the latest completed root
+  // iteration.  Values are engine scores; index 0..5 is R/A/C/P/N/B.
+  Value darkIdentityScore[6] = { VALUE_NONE, VALUE_NONE, VALUE_NONE,
+                                 VALUE_NONE, VALUE_NONE, VALUE_NONE };
+  int darkIdentityCount[6] = { 0, 0, 0, 0, 0, 0 };
 };
 
 typedef std::vector<RootMove> RootMoves;

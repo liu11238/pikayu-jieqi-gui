@@ -21,6 +21,7 @@
 #include <cmath>
 #include <cstring>   // For std::memset
 #include <iostream>
+#include <string>
 #include <sstream>
 
 #include "evaluate.h"
@@ -43,6 +44,34 @@ namespace {
 
 inline bool dark_worst_mode() {
     return Stockfish::Options["DarkSearchMode"] == "Worst";
+}
+
+inline bool jieqi_gui_info() {
+    return bool(Stockfish::Options["JieQi GUI Info"]);
+}
+
+// Keep the wire format deliberately small and dependency-free.  The GUI only
+// needs the six identity labels and scores for the currently reported root PV.
+inline std::string jieqi_gui_info_string(const Search::RootMove& rootMove) {
+    static constexpr char labels[] = "RACPNB";
+    std::ostringstream json;
+    json << "info string JQ {\"move\":\"" << UCI::move(rootMove.pv[0])
+         << "\",\"mode\":\"" << std::string(Options["DarkSearchMode"])
+         << "\",\"identities\":{";
+    bool first = true;
+    for (int i = 0; i < 6; ++i)
+    {
+        if (rootMove.darkIdentityScore[i] == VALUE_NONE)
+            continue;
+        if (!first)
+            json << ",";
+        first = false;
+        json << "\"" << labels[i] << "\":{";
+        json << "\"score\":" << int(rootMove.darkIdentityScore[i])
+             << ",\"count\":" << rootMove.darkIdentityCount[i] << "}";
+    }
+    json << "}}";
+    return json.str();
 }
 
 // Keep the existing dark-depth limit as a recursion guard.  Worst mode gets
@@ -443,7 +472,14 @@ void Thread::search() {
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
       for (RootMove& rm : rootMoves)
+      {
           rm.previousScore = rm.score;
+          for (int i = 0; i < 6; ++i)
+          {
+              rm.darkIdentityScore[i] = VALUE_NONE;
+              rm.darkIdentityCount[i] = 0;
+          }
+      }
 
       size_t pvFirst = 0;
       pvLast = rootMoves.size();
@@ -1390,6 +1426,16 @@ dark_while:
           else
           {
               value = SC.CalcEvg();
+              if (rootNode && jieqi_gui_info())
+              {
+                  RootMove& rm = *std::find(thisThread->rootMoves.begin(),
+                                            thisThread->rootMoves.end(), move);
+                  for (int i = 0; i < 6; ++i)
+                  {
+                      rm.darkIdentityScore[i] = Value(SC.identityScore(i));
+                      rm.darkIdentityCount[i] = SC.identityCount(i);
+                  }
+              }
 #if SEARCHDEBUG
               if (darkPrint) {
                   DarkSearchInfo.append("----evg:");
@@ -2187,6 +2233,9 @@ string UCI::pv(const Position& pos, Depth depth, Value alpha, Value beta) {
       for (Move m : rootMoves[i].pv)
           ss << " " << UCI::move(m);
   }
+
+  if (jieqi_gui_info() && !rootMoves.empty() && rootMoves[0].pv[0] != MOVE_NONE)
+      ss << "\n" << jieqi_gui_info_string(rootMoves[0]);
 
   return ss.str();
 }

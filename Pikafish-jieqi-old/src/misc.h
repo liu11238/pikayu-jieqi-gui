@@ -360,7 +360,7 @@ public:
     // vTmp is evaluated from the side that made the move's perspective.
     void setUs(bool darkOwnerIsRootSide) { _us = darkOwnerIsRootSide; }
 
-    void append(Piece, int score, int count) {
+    void append(Piece piece, int score, int count) {
         // In Expected mode, normalize every result to the root side before
         // averaging, then restore the moving-side perspective in CalcEvg().
         // The historical reference side is the first (red) side, not the
@@ -387,9 +387,18 @@ public:
             score = std::clamp(score, -DARKVALRATE, DARKVALRATE);
         if (_min > score)_min = score;
         if (_max < score)_max = score;
+        int identity = identityIndex(type_of(piece));
+        if (identity >= 0)
+        {
+            _identityScore[identity] = score;
+            _identityCount[identity] = count;
+        }
         _totalScore += score * count;
         _totalCount += count;
     }
+
+    int identityScore(int index) const { return _identityScore[index]; }
+    int identityCount(int index) const { return _identityCount[index]; }
 
     Value CalcEvg() {
         if (!_totalCount)
@@ -417,6 +426,19 @@ public:
     }
 
 private:
+    static int identityIndex(PieceType type) {
+        switch (type)
+        {
+        case ROOK: return 0;
+        case ADVISOR: return 1;
+        case CANNON: return 2;
+        case PAWN: return 3;
+        case KNIGHT: return 4;
+        case BISHOP: return 5;
+        default: return -1;
+        }
+    }
+
     // Engine mate scores are VALUE_MATE - plies (mated: negated) with plies
     // in [1, MAX_PLY].
     static bool isMateScore(int score) {
@@ -458,6 +480,9 @@ private:
     //int _types = 0;
     int _min = 99999999;
     int _max = -99999999;
+    int _identityScore[6] = { VALUE_NONE, VALUE_NONE, VALUE_NONE,
+                              VALUE_NONE, VALUE_NONE, VALUE_NONE };
+    int _identityCount[6] = { 0, 0, 0, 0, 0, 0 };
 };
 
 
